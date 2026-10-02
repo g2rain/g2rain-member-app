@@ -155,9 +155,18 @@ docker run --rm -p 8080:8080 \
 
 使用 `feature/<name>` 或 `fix/<name>` 分支向 `develop` 提交，测试环境验证后再合并到 `main`。修改模板会影响所有后续生成项目，请尽量补充必要测试和文档，并确保 `npm run build` 通过。
 
-## 许可证与联系
+## 许可证与作者
 
-本项目基于 [Apache License 2.0](LICENSE) 开源。
+本项目基于 [Apache License 2.0](LICENSE) 开源。版权归属：Copyright 2025-2026 g2rain.com。
+
+### 作者
+
+| 作者 | 联系 |
+| --- | --- |
+| Jagger | g2rain_developer@163.com · [g2rain.com](https://www.g2rain.com/) |
+| Alpha | [g2rain.com](https://www.g2rain.com/) |
+
+### 联系
 
 - 官网：[g2rain.com](https://www.g2rain.com)
 - Issues：[GitHub Issues](https://github.com/g2rain/g2rain/issues)

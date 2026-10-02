@@ -1,6 +1,6 @@
 {
   "name": "g2rain-member-app",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "g2rain-member-app - G2rain Vue 3 micro-frontend sub-app (Vite + qiankun + Element Plus).",
   "private": false,
   "license": "Apache-2.0",
@@ -24,6 +24,11 @@
     "element-plus",
     "pinia"
   ],
+  "author": {
+    "name": "g2rain.com",
+    "email": "g2rain_developer@163.com",
+    "url": "https://www.g2rain.com/"
+  },
   "contributors": [
     {
       "name": "Jagger",

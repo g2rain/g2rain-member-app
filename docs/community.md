@@ -14,7 +14,14 @@
 
 ## 许可证
 
-本项目基于 [Apache License 2.0](../LICENSE) 开源。
+本项目基于 [Apache License 2.0](../LICENSE) 开源。版权归属：Copyright 2025-2026 g2rain.com。
+
+## 作者
+
+| 作者 | 联系 |
+| --- | --- |
+| Jagger | g2rain_developer@163.com · [g2rain.com](https://www.g2rain.com/) |
+| Alpha | [g2rain.com](https://www.g2rain.com/) |
 
 ## 致谢
 

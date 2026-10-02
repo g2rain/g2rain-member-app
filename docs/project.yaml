@@ -3,7 +3,7 @@ name: g2rain-member-app
 family: frontend-app
 role: g2rain Vue 3 微前端业务应用
 packageName: g2rain-member-app
-version: 1.0.0
+version: 1.0.1
 license: Apache-2.0
 
 architectureBaseline:
