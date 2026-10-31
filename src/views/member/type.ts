@@ -9,6 +9,8 @@ import type { BaseSelectListDto, BaseVo } from '@platform/types/api.type';
  */
 export interface Member extends BaseVo {
   organId: number;
+  /** 网关根据 organId 补全 */
+  organName?: string;
   memberNo: string;
   name: string;
   avatar: string;

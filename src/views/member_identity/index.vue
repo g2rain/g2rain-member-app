@@ -6,23 +6,20 @@
       <!-- 基础查询表单（BaseSelectListDto） -->
       <QueryForm ref="queryFormRef" v-model="baseQueryForm" @search="handleSearch">
         <!-- 业务特定查询字段 -->
-        <el-form-item label="机构标识，关联 g2rain_basis.organ.id，身份归属租户">
-          <el-input v-model="queryForm.organId" placeholder="请输入机构标识，关联 g2rain_basis.organ.id，身份归属租户" clearable style="width: 200px" />
+        <el-form-item :label="$t('G2_FIELD_ORGAN', '所属机构')">
+          <OrganSelect v-model="queryForm.organId" :api-method="OrganApi.searchOrgans" :placeholder="$t('G2_PH_ORGAN', '请选择所属机构')" width="200px" />
         </el-form-item>
-        <el-form-item label="会员标识，关联 member.id">
-          <el-input v-model="queryForm.memberId" placeholder="请输入会员标识，关联 member.id" clearable style="width: 200px" />
+        <el-form-item :label="$t('MEM_IDENTITY_FIELD_MEMBER_ID', '会员ID')">
+          <el-input v-model="queryForm.memberId" :placeholder="$t('MEM_IDENTITY_PH_MEMBER_ID', '请输入会员ID')" clearable style="width: 200px" />
         </el-form-item>
-        <el-form-item label="身份类型">
-          <el-input v-model="queryForm.identityType" placeholder="请输入身份类型" clearable style="width: 200px" />
+        <el-form-item :label="$t('MEM_IDENTITY_FIELD_IDENTITY_TYPE', '身份类型')">
+          <DictSelect v-model="queryForm.identityType" usage-code="MEMBER_IDENTITY_TYPE" :api-method="DictItemApi.select" :placeholder="$t('MEM_IDENTITY_PH_IDENTITY_TYPE', '请选择身份类型')" />
         </el-form-item>
-        <el-form-item label="身份值；企业微信为 external_userid，手机号为标准化后的手机号">
-          <el-input v-model="queryForm.identityValue" placeholder="请输入身份值；企业微信为 external_userid，手机号为标准化后的手机号" clearable style="width: 200px" />
+        <el-form-item :label="$t('MEM_IDENTITY_FIELD_IDENTITY_VALUE', '身份值')">
+          <el-input v-model="queryForm.identityValue" :placeholder="$t('MEM_IDENTITY_PH_IDENTITY_VALUE', '请输入身份值')" clearable style="width: 200px" />
         </el-form-item>
-        <el-form-item label="验证ID">
-          <el-input v-model="queryForm.verified" placeholder="请输入验证ID" clearable style="width: 200px" />
-        </el-form-item>
-        <el-form-item label="外部身份原始资料，JSON 格式">
-          <el-input v-model="queryForm.rawProfile" placeholder="请输入外部身份原始资料，JSON 格式" clearable style="width: 200px" />
+        <el-form-item :label="$t('MEM_IDENTITY_FIELD_VERIFIED', '验证状态')">
+          <DictSelect v-model="queryForm.verified" usage-code="BOOLEAN_FLAG" :api-method="DictItemApi.select" :placeholder="$t('MEM_IDENTITY_PH_VERIFIED', '请选择验证状态')" />
         </el-form-item>
 
         <!-- 操作按钮 -->
@@ -38,19 +35,30 @@
     <!-- 标题和操作按钮 -->
     <div class="member_identity-page__header">
       <div class="member_identity-page__title-group">
-        <h2>管理会员身份表数据</h2>
+        <h2>{{ $t('MEM_IDENTITY_TITLE', '会员身份') }}</h2>
       </div>
-      <el-button type="primary" v-permission="'member_identity:add'" @click="handleCreate">新增会员身份表</el-button>
+      <el-button type="primary" v-permission="'member_identity:add'" @click="handleCreate">{{ $t('MEM_IDENTITY_BTN_ADD', '新增会员身份') }}</el-button>
     </div>
 
     <SortableTable :data="tableData" border stripe style="width: 100%" :enable-multi-sort="true" @sort-change="handleSortChange">
       <el-table-column prop="id" :label="$t('G2_FIELD_ID', 'ID')" width="120" />
-      <el-table-column prop="organId" label="机构标识，关联 g2rain_basis.organ.id，身份归属租户" width="140" />
-      <el-table-column prop="memberId" label="会员标识，关联 member.id" width="140" />
-      <el-table-column prop="identityType" label="身份类型" width="180" />
-      <el-table-column prop="identityValue" label="身份值；企业微信为 external_userid，手机号为标准化后的手机号" width="180" />
-      <el-table-column prop="verified" label="验证ID" width="140" />
-      <el-table-column prop="rawProfile" label="外部身份原始资料，JSON 格式" width="180" />
+      <el-table-column :label="$t('G2_FIELD_ORGAN', '所属机构')" width="140">
+        <template #default="{ row }">
+          {{ row.organName || row.organId }}
+        </template>
+      </el-table-column>
+      <el-table-column prop="memberId" :label="$t('MEM_IDENTITY_FIELD_MEMBER_ID', '会员ID')" width="140" />
+      <el-table-column prop="identityType" :label="$t('MEM_IDENTITY_FIELD_IDENTITY_TYPE', '身份类型')" width="140">
+        <template #default="{ row }">
+          <DictText :value="row.identityType" usage-code="MEMBER_IDENTITY_TYPE" :api-method="DictItemApi.select" />
+        </template>
+      </el-table-column>
+      <el-table-column prop="identityValue" :label="$t('MEM_IDENTITY_FIELD_IDENTITY_VALUE', '身份值')" width="180" />
+      <el-table-column prop="verified" :label="$t('MEM_IDENTITY_FIELD_VERIFIED', '验证状态')" width="160">
+        <template #default="{ row }">
+          <DictText :value="row.verified" usage-code="BOOLEAN_FLAG" :api-method="DictItemApi.select" />
+        </template>
+      </el-table-column>
       <TableColumn prop="createTime" :label="$t('G2_FIELD_CREATE_TIME', '创建时间')" width="180" sortable="custom" />
       <TableColumn prop="updateTime" :label="$t('G2_FIELD_UPDATE_TIME', '更新时间')" width="180" sortable="custom" />
       <el-table-column :label="$t('G2_FIELD_ACTION', '操作')" fixed="right" width="280">
@@ -82,25 +90,25 @@
     </div>
 
     <!-- 新增 / 编辑弹窗 -->
-    <el-dialog v-model="editDialogVisible" :title="isEdit ? '编辑会员身份表' : '新增会员身份表'" width="520px">
-      <el-form ref="editFormRef" :model="editForm" :rules="editRules" label-width="100px">
-        <el-form-item label="机构标识，关联 g2rain_basis.organ.id，身份归属租户" prop="organId">
-          <el-input v-model="editForm.organId" placeholder="请输入机构标识，关联 g2rain_basis.organ.id，身份归属租户" />
+    <el-dialog v-model="editDialogVisible" :title="isEdit ? $t('MEM_IDENTITY_DLG_EDIT', '编辑会员身份') : $t('MEM_IDENTITY_DLG_ADD', '新增会员身份')" width="520px">
+      <el-form ref="editFormRef" :model="editForm" :rules="editRules" label-width="160px">
+        <el-form-item :label="$t('G2_FIELD_ORGAN', '所属机构')" prop="organId">
+          <OrganSelect v-model="editForm.organId" :api-method="OrganApi.searchOrgans" :placeholder="$t('G2_PH_ORGAN', '请选择所属机构')" width="100%" />
         </el-form-item>
-        <el-form-item label="会员标识，关联 member.id" prop="memberId">
-          <el-input v-model="editForm.memberId" placeholder="请输入会员标识，关联 member.id" />
+        <el-form-item :label="$t('MEM_IDENTITY_FIELD_MEMBER_ID', '会员ID')" prop="memberId">
+          <el-input v-model="editForm.memberId" :placeholder="$t('MEM_IDENTITY_PH_MEMBER_ID', '请输入会员ID')" />
         </el-form-item>
-        <el-form-item label="身份类型" prop="identityType">
-          <el-input v-model="editForm.identityType" placeholder="请输入身份类型" />
+        <el-form-item :label="$t('MEM_IDENTITY_FIELD_IDENTITY_TYPE', '身份类型')" prop="identityType">
+          <DictSelect v-model="editForm.identityType" usage-code="MEMBER_IDENTITY_TYPE" :api-method="DictItemApi.select" :placeholder="$t('MEM_IDENTITY_PH_IDENTITY_TYPE', '请选择身份类型')" />
         </el-form-item>
-        <el-form-item label="身份值；企业微信为 external_userid，手机号为标准化后的手机号" prop="identityValue">
-          <el-input v-model="editForm.identityValue" placeholder="请输入身份值；企业微信为 external_userid，手机号为标准化后的手机号" />
+        <el-form-item :label="$t('MEM_IDENTITY_FIELD_IDENTITY_VALUE', '身份值')" prop="identityValue">
+          <el-input v-model="editForm.identityValue" :placeholder="$t('MEM_IDENTITY_PH_IDENTITY_VALUE', '请输入身份值')" />
         </el-form-item>
-        <el-form-item label="验证ID" prop="verified">
-          <el-input v-model="editForm.verified" placeholder="请输入验证ID" />
+        <el-form-item :label="$t('MEM_IDENTITY_FIELD_VERIFIED', '验证状态')" prop="verified">
+          <DictSelect v-model="editForm.verified" usage-code="BOOLEAN_FLAG" :api-method="DictItemApi.select" :placeholder="$t('MEM_IDENTITY_PH_VERIFIED', '请选择验证状态')" />
         </el-form-item>
-        <el-form-item label="外部身份原始资料，JSON 格式" prop="rawProfile">
-          <el-input v-model="editForm.rawProfile" placeholder="请输入外部身份原始资料，JSON 格式" />
+        <el-form-item :label="$t('MEM_IDENTITY_FIELD_RAW_PROFILE', '原始资料')" prop="rawProfile">
+          <el-input v-model="editForm.rawProfile" type="textarea" :rows="4" :placeholder="$t('MEM_IDENTITY_PH_RAW_PROFILE', '请输入原始资料')" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -112,15 +120,19 @@
     </el-dialog>
 
     <!-- 明细弹窗 -->
-    <el-dialog v-model="detailDialogVisible" title="会员身份表明细" width="520px">
+    <el-dialog v-model="detailDialogVisible" :title="$t('MEM_IDENTITY_DLG_DETAIL', '会员身份明细')" width="520px">
       <el-descriptions :column="1" border>
         <el-descriptions-item :label="$t('G2_FIELD_ID', 'ID')">{{ currentRow?.id }}</el-descriptions-item>
-        <el-descriptions-item label="机构标识，关联 g2rain_basis.organ.id，身份归属租户">{{ currentRow?.organId }}</el-descriptions-item>
-        <el-descriptions-item label="会员标识，关联 member.id">{{ currentRow?.memberId }}</el-descriptions-item>
-        <el-descriptions-item label="身份类型">{{ currentRow?.identityType }}</el-descriptions-item>
-        <el-descriptions-item label="身份值；企业微信为 external_userid，手机号为标准化后的手机号">{{ currentRow?.identityValue }}</el-descriptions-item>
-        <el-descriptions-item label="验证ID">{{ currentRow?.verified }}</el-descriptions-item>
-        <el-descriptions-item label="外部身份原始资料，JSON 格式">{{ currentRow?.rawProfile }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('G2_FIELD_ORGAN', '所属机构')">{{ currentRow?.organName || currentRow?.organId }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('MEM_IDENTITY_FIELD_MEMBER_ID', '会员ID')">{{ currentRow?.memberId }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('MEM_IDENTITY_FIELD_IDENTITY_TYPE', '身份类型')">
+          <DictText :value="currentRow?.identityType" usage-code="MEMBER_IDENTITY_TYPE" :api-method="DictItemApi.select" />
+        </el-descriptions-item>
+        <el-descriptions-item :label="$t('MEM_IDENTITY_FIELD_IDENTITY_VALUE', '身份值')">{{ currentRow?.identityValue }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('MEM_IDENTITY_FIELD_VERIFIED', '验证状态')">
+          <DictText :value="currentRow?.verified" usage-code="BOOLEAN_FLAG" :api-method="DictItemApi.select" />
+        </el-descriptions-item>
+        <el-descriptions-item :label="$t('MEM_IDENTITY_FIELD_RAW_PROFILE', '原始资料')">{{ currentRow?.rawProfile }}</el-descriptions-item>
         <el-descriptions-item :label="$t('G2_FIELD_CREATE_TIME', '创建时间')">{{ currentRow?.createTime }}</el-descriptions-item>
         <el-descriptions-item :label="$t('G2_FIELD_UPDATE_TIME', '更新时间')">{{ currentRow?.updateTime }}</el-descriptions-item>
       </el-descriptions>
@@ -134,15 +146,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, computed, onMounted } from 'vue';
 import type { FormInstance, FormRules } from 'element-plus';
 import { ElMessageBox, ElMessage } from 'element-plus';
 import { t } from '@platform/i18n';
 import { MemberIdentityApi } from './api';
+import { OrganApi } from '../organ/api';
+import { DictItemApi } from '../dict/api';
 import type { MemberIdentity, MemberIdentityPayload, MemberIdentityQuery } from './type';
 import type { BaseSelectListDto, PageSelectListDto } from '@platform/types/api.type';
 
 import { SortableTable, TableColumn, SortManagerButton, QueryForm } from '@g2rain/ui';
+import { OrganSelect, DictSelect, DictText } from '@g2rain/ui/platform';
 
 
 // 组件引用
@@ -158,12 +173,11 @@ const baseQueryForm = ref<BaseSelectListDto>({
 
 // 业务查询状态
 const queryForm = reactive({
-  organId: undefined,
-  memberId: undefined,
-  identityType: '',
+  organId: undefined as number | undefined,
+  memberId: undefined as number | undefined,
+  identityType: undefined as string | undefined,
   identityValue: '',
-  verified: undefined,
-  rawProfile: '',
+  verified: undefined as string | undefined,
 });
 
 // 分页相关状态
@@ -180,9 +194,12 @@ const tableData = ref<MemberIdentity[]>([]);
 const loadData = async () => {
   try {
     // 合并基础查询 + 业务查询，并过滤空值
+    const merged = { ...baseQueryForm.value, ...queryForm } as Record<string, unknown>;
+    if (merged.verified !== undefined && merged.verified !== null && merged.verified !== '') {
+      merged.verified = Number(merged.verified);
+    }
     const query = Object.fromEntries(
-      Object.entries({ ...baseQueryForm.value, ...queryForm })
-        .filter(([_, v]) => (v ?? '') !== '' && [v].flat().length)
+      Object.entries(merged).filter(([_, v]) => (v ?? '') !== '' && [v].flat().length)
     ) as MemberIdentityQuery;
 
     // 请求分页数据
@@ -221,10 +238,9 @@ const handleReset = () => {
   // 重置业务特定查询表单
   queryForm.organId = undefined;
   queryForm.memberId = undefined;
-  queryForm.identityType = '';
+  queryForm.identityType = undefined;
   queryForm.identityValue = '';
   queryForm.verified = undefined;
-  queryForm.rawProfile = '';
 
   pagination.pageNum = 1; // 重置到第一页
   loadData();
@@ -256,7 +272,10 @@ const handleView = (row: MemberIdentity) => {
 
 // 删除数据记录
 const handleDelete = (row: MemberIdentity) => {
-  ElMessageBox.confirm(`确认删除会员身份表「${row.id}」吗？`, t('G2_LBL_TIP', '提示'), {
+  ElMessageBox.confirm(
+    t('MEM_IDENTITY_DEL_CONFIRM', { id: row.id }, '确认删除会员身份「{id}」吗？'),
+    t('G2_LBL_TIP', '提示'),
+    {
     type: 'warning',
   })
     .then(async () => {
@@ -285,20 +304,20 @@ const editForm = reactive({
   id: undefined as number | undefined,
   organId: undefined as number | undefined,
   memberId: undefined as number | undefined,
-  identityType: '',
+  identityType: undefined as string | undefined,
   identityValue: '',
-  verified: undefined as number | undefined,
+  verified: undefined as string | undefined,
   rawProfile: '',
 });
 
 // 表单校验规则
-const editRules: FormRules = {
-  organId: [{ required: true, message: '请输入机构标识，关联 g2rain_basis.organ.id，身份归属租户', trigger: 'blur' }],
-  memberId: [{ required: true, message: '请输入会员标识，关联 member.id', trigger: 'blur' }],
-  identityType: [{ required: true, message: '请输入身份类型[WECHAT_WORK:企业微信, MOBILE:手机号]', trigger: 'blur' }],
-  identityValue: [{ required: true, message: '请输入身份值；企业微信为 external_userid，手机号为标准化后的手机号', trigger: 'blur' }],
-  verified: [{ required: true, message: '请输入验证标识[0:未验证, 1:已验证]', trigger: 'blur' }],
-};
+const editRules = computed<FormRules>(() => ({
+  organId: [{ required: true, message: t('G2_PH_ORGAN', '请选择所属机构'), trigger: 'change' }],
+  memberId: [{ required: true, message: t('MEM_IDENTITY_PH_MEMBER_ID', '请输入会员ID'), trigger: 'blur' }],
+  identityType: [{ required: true, message: t('MEM_IDENTITY_PH_IDENTITY_TYPE', '请选择身份类型'), trigger: 'change' }],
+  identityValue: [{ required: true, message: t('MEM_IDENTITY_PH_IDENTITY_VALUE', '请输入身份值'), trigger: 'blur' }],
+  verified: [{ required: true, message: t('MEM_IDENTITY_PH_VERIFIED', '请选择验证状态'), trigger: 'change' }],
+}));
 
 // 打开创建弹窗
 const handleCreate = () => {
@@ -307,7 +326,7 @@ const handleCreate = () => {
 
   editForm.organId = undefined;
   editForm.memberId = undefined;
-  editForm.identityType = '';
+  editForm.identityType = undefined;
   editForm.identityValue = '';
   editForm.verified = undefined;
   editForm.rawProfile = '';
@@ -324,7 +343,7 @@ const handleEdit = (row: MemberIdentity) => {
   editForm.memberId = row.memberId;
   editForm.identityType = row.identityType;
   editForm.identityValue = row.identityValue;
-  editForm.verified = row.verified;
+  editForm.verified = row.verified === undefined || row.verified === null ? undefined : String(row.verified);
   editForm.rawProfile = row.rawProfile;
   editDialogVisible.value = true;
 };
@@ -340,7 +359,7 @@ const submitEdit = async () => {
     memberId: editForm.memberId,
     identityType: editForm.identityType,
     identityValue: editForm.identityValue,
-    verified: editForm.verified,
+    verified: editForm.verified === undefined || editForm.verified === '' ? undefined : Number(editForm.verified),
     rawProfile: editForm.rawProfile,
   };
 
