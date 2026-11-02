@@ -9,7 +9,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Vite](https://img.shields.io/badge/Vite-7-646CFF?logo=vite&logoColor=white)](https://vite.dev/)
 
-g2rain-member-app 是 g2rain Vue 3 微前端子应用，提供 qiankun 集成、独立运行、SSO/Token、动态资源路由、权限、国际化、HTTP、Mock、业务页面代码生成、资源配置生成和 OpenResty 部署能力。
+G2rain（谷雨）是面向企业的开源智能体平台，连接模型、知识与业务工具，并以 SaaS 基座和应用开发工具链支撑智能应用落地。平台已具备应用开发、部署与使用的基础；智能体平台与智能客服已开发完成并开源，交易、订阅、计量计费等商业化能力仍处于规划设计中。`g2rain-member-app` 只是其中的 Vue 3 会员业务微前端应用模板，提供 qiankun 集成、独立运行、SSO 接线、动态资源路由、权限 UI、国际化、HTTP、Mock、业务页面代码生成、资源配置生成和 OpenResty 部署能力；它不代表整个平台，也不替代 IAM、Gateway 或后端服务的职责。
 
 本仓库是“被生成的应用模板”源仓，不是 CLI 本身。[g2rain-app-cli](https://github.com/g2rain/g2rain-app-cli)（npm：`create-g2rain-app`）在发布时通过 `npm run sync:template` 将本仓快照嵌入包内 `template/`，再负责复制、替换 `g2rain-member-app` 与 `member`，并将包信息和项目文档转换为业务 App 身份；生成后的应用继续使用本仓库约定的命令开发页面和生成资源配置。
 
@@ -73,6 +73,15 @@ npm run dev
 | `g2rain-app generate --tables=dict` | 按 SQL 表生成业务页面骨架 |
 | `g2rain-app build-config` | 生成页面和页面元素资源 JSON |
 
+## GHCR 镜像
+
+- 镜像地址：`ghcr.io/g2rain/g2rain-member-app`。
+- 稳定版使用 `1.0.0` 这类版本标签，同时发布 `sha-<完整提交 SHA>`；不会发布或更新 `latest`。
+- 包设为 Public 后可拉取：`docker pull ghcr.io/g2rain/g2rain-member-app:1.0.0`。
+- 仅推送精确格式的 `v<major>.<minor>.<patch>` Git tag 才触发发布；tag 提交必须已进入 `main` 历史，并包含同名、非空的发布说明。
+
+完整的 GHCR 权限、首次公开、发布顺序、镜像内容和运行配置见[构建与部署](docs/operations/deployment.md#容器镜像发布ghcr)。
+
 ## 代码生成
 
 先把需要生成的 `CREATE TABLE` 放入 `scripts/database.sql`，再执行：
@@ -126,16 +135,16 @@ flowchart LR
 - `SSO_BASE_URL` 在容器启动时写入 `env-config.js`。
 
 ```bash
-docker build --build-arg VITE_BUILD_MODE=production -t g2rain/your-app:latest .
+./build.sh --image ghcr.io/g2rain/g2rain-member-app --tag 1.0.0 --build-mode production
 docker run --rm -p 8080:8080 \
   -e SERVER_PORT=8080 \
-  -e CONTEXT_PATH=/your-app \
+  -e CONTEXT_PATH=/member \
   -e GATEWAY_HOST=gateway \
   -e GATEWAY_PORT=8080 \
   -e IAM_HOST=iam \
   -e IAM_PORT=8080 \
   -e SSO_BASE_URL=https://example.com \
-  g2rain/your-app:latest
+  ghcr.io/g2rain/g2rain-member-app:1.0.0
 ```
 
 完整变量和安全要求见[配置](docs/operations/configuration.md)、[构建与部署](docs/operations/deployment.md)和[安全边界](docs/security/security-boundaries.md)。
@@ -149,7 +158,7 @@ docker run --rm -p 8080:8080 \
 | 架构、层次和依赖 | [架构概览](docs/architecture/overview.md) · [层次职责](docs/architecture/layers.md) · [偏差](docs/architecture/deviations.md) |
 | 页面和复用能力 | [Views 规范](docs/development/views-conventions.md) · [Components 与 Platform](docs/development/components-and-platform.md) |
 | 生成能力 | [代码生成](docs/development/code-generation.md) · [资源配置生成](docs/development/resource-generation.md) |
-| 开发和交付 | [本地开发](docs/development/local-development.md) · [完成定义](docs/development/definition-of-done.md) · [部署](docs/operations/deployment.md) |
+| 开发和交付 | [本地开发](docs/development/local-development.md) · [完成定义](docs/development/definition-of-done.md) · [部署](docs/operations/deployment.md) · [发布记录](docs/releases/README.md) |
 
 ## 参与贡献
 

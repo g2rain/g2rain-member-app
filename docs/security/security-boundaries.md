@@ -12,7 +12,7 @@
 - `VITE_*`、`env-config.js`、前端 Bundle 和浏览器 Storage 均不是 Secret 存储。
 - Lua 私钥、IAM 公钥/Key ID 通过部署 Secret 或 Volume 注入，不提交真实文件。
 - 示例、Mock、生成模板和文档只使用无效占位值。
-- Docker 镜像构建上下文和镜像层不得包含本地密钥。
+- Docker 镜像构建上下文和镜像层不得包含本地密钥。当前 Dockerfile 只复制 Lua 程序文件并在最终镜像创建空的 `lua/keys/`；生产 `private-key.der`、`public-key.der`、可选 IAM 公钥和 Key ID 必须通过 Secret/受控 Volume 注入。`.dockerignore` 会排除 `.env` 和 `lua/keys/README.md`，但 `.env.production` 会进入构建阶段，首次公开镜像前必须人工复核其公开占位配置；`.dockerignore` 不能治理 Git 历史或已经打包的内容。
 
 ## HTTP 与代理
 
