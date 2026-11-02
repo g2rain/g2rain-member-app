@@ -24,6 +24,11 @@
     "element-plus",
     "pinia"
   ],
+  "author": {
+    "name": "g2rain.com",
+    "email": "g2rain_developer@163.com",
+    "url": "https://www.g2rain.com/"
+  },
   "contributors": [
     {
       "name": "Jagger",
@@ -45,10 +50,10 @@
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.2",
-    "@g2rain/http": "1.0.0",
-    "@g2rain/platform": "1.0.0",
-    "@g2rain/theme": "1.0.0",
-    "@g2rain/ui": "1.0.0",
+    "@g2rain/http": "^1.0.1",
+    "@g2rain/platform": "^1.0.1",
+    "@g2rain/theme": "^1.0.1",
+    "@g2rain/ui": "^1.0.1",
     "axios": "^1.13.2",
     "element-plus": "^2.13.0",
     "jose": "^6.1.3",

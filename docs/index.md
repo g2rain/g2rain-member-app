@@ -26,6 +26,7 @@
 - [测试策略](development/testing.md)
 - [完成定义](development/definition-of-done.md)
 - [Git 工作流](development/git-workflow.md)
+- [发布记录](releases/README.md)
 
 ## 运行与安全
 

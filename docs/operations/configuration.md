@@ -4,8 +4,8 @@
 
 | 变量 | 用途 | 当前默认/示例 |
 | --- | --- | --- |
-| `VITE_APPLICATION_CODE` | 资源加载和 qiankun 应用编码 | `{{PROJECT_NAME}}` |
-| `VITE_CONTEXT_PATH` | Vite base、前端请求和回调基础路径 | `/{{CONTEXT_PATH}}` |
+| `VITE_APPLICATION_CODE` | 资源加载和 qiankun 应用编码 | `g2rain-member-app` |
+| `VITE_CONTEXT_PATH` | Vite base、前端请求和回调基础路径 | `/member` |
 | `VITE_BACKEND_ORIGIN` | 本地开发代理目标 | `http://localhost:8080` |
 | `VITE_TOKEN_END_POINT` | Token 端点 | `/auth/token` |
 | `VITE_AUTH_END_POINT` | 授权端点 | `/auth/authorize` |

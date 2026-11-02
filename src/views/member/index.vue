@@ -6,23 +6,20 @@
       <!-- 基础查询表单（BaseSelectListDto） -->
       <QueryForm ref="queryFormRef" v-model="baseQueryForm" @search="handleSearch">
         <!-- 业务特定查询字段 -->
-        <el-form-item label="机构标识，关联 g2rain_basis.organ.id，会员归属租户">
-          <el-input v-model="queryForm.organId" placeholder="请输入机构标识，关联 g2rain_basis.organ.id，会员归属租户" clearable style="width: 200px" />
+        <el-form-item :label="$t('G2_FIELD_ORGAN', '所属机构')">
+          <OrganSelect v-model="queryForm.organId" :api-method="OrganApi.searchOrgans" :placeholder="$t('G2_PH_ORGAN', '请选择所属机构')" width="200px" />
         </el-form-item>
-        <el-form-item label="会员编号，机构内唯一，由系统生成">
-          <el-input v-model="queryForm.memberNo" placeholder="请输入会员编号，机构内唯一，由系统生成" clearable style="width: 200px" />
+        <el-form-item :label="$t('MEM_MEMBER_FIELD_MEMBER_NO', '会员编号')">
+          <el-input v-model="queryForm.memberNo" :placeholder="$t('MEM_MEMBER_PH_MEMBER_NO', '请输入会员编号')" clearable style="width: 200px" />
         </el-form-item>
-        <el-form-item label="会员名称">
-          <el-input v-model="queryForm.name" placeholder="请输入会员名称" clearable style="width: 200px" />
+        <el-form-item :label="$t('MEM_MEMBER_FIELD_NAME', '会员名称')">
+          <el-input v-model="queryForm.name" :placeholder="$t('MEM_MEMBER_PH_NAME', '请输入会员名称')" clearable style="width: 200px" />
         </el-form-item>
-        <el-form-item label="会员头像地址">
-          <el-input v-model="queryForm.avatar" placeholder="请输入会员头像地址" clearable style="width: 200px" />
+        <el-form-item :label="$t('G2_FIELD_MOBILE', '手机号')">
+          <el-input v-model="queryForm.mobile" :placeholder="$t('G2_PH_MOBILE', '请输入手机号')" clearable style="width: 200px" />
         </el-form-item>
-        <el-form-item label="会员手机号，仅作为资料字段，登录身份以 member_identity 为准">
-          <el-input v-model="queryForm.mobile" placeholder="请输入会员手机号，仅作为资料字段，登录身份以 member_identity 为准" clearable style="width: 200px" />
-        </el-form-item>
-        <el-form-item label="会员状态">
-          <el-input v-model="queryForm.status" placeholder="请输入会员状态" clearable style="width: 200px" />
+        <el-form-item :label="$t('G2_FIELD_STATUS', '状态')">
+          <DictSelect v-model="queryForm.status" usage-code="SUBJECT_STATUS" :api-method="DictItemApi.select" :placeholder="$t('G2_PH_STATUS', '请选择状态')" />
         </el-form-item>
 
         <!-- 操作按钮 -->
@@ -38,19 +35,27 @@
     <!-- 标题和操作按钮 -->
     <div class="member-page__header">
       <div class="member-page__title-group">
-        <h2>管理会员表数据</h2>
+        <h2>{{ $t('MEM_MEMBER_TITLE', '会员') }}</h2>
       </div>
-      <el-button type="primary" v-permission="'member:add'" @click="handleCreate">新增会员表</el-button>
+      <el-button type="primary" v-permission="'member:add'" @click="handleCreate">{{ $t('MEM_MEMBER_BTN_ADD', '新增会员') }}</el-button>
     </div>
 
     <SortableTable :data="tableData" border stripe style="width: 100%" :enable-multi-sort="true" @sort-change="handleSortChange">
       <el-table-column prop="id" :label="$t('G2_FIELD_ID', 'ID')" width="120" />
-      <el-table-column prop="organId" label="机构标识，关联 g2rain_basis.organ.id，会员归属租户" width="140" />
-      <el-table-column prop="memberNo" label="会员编号，机构内唯一，由系统生成" width="180" />
-      <el-table-column prop="name" label="会员名称" width="180" />
-      <el-table-column prop="avatar" label="会员头像地址" width="180" />
-      <el-table-column prop="mobile" label="会员手机号，仅作为资料字段，登录身份以 member_identity 为准" width="180" />
-      <el-table-column prop="status" label="会员状态" width="180" />
+      <el-table-column :label="$t('G2_FIELD_ORGAN', '所属机构')" width="140">
+        <template #default="{ row }">
+          {{ row.organName || row.organId }}
+        </template>
+      </el-table-column>
+      <el-table-column prop="memberNo" :label="$t('MEM_MEMBER_FIELD_MEMBER_NO', '会员编号')" width="180" />
+      <el-table-column prop="name" :label="$t('MEM_MEMBER_FIELD_NAME', '会员名称')" width="180" />
+      <el-table-column prop="avatar" :label="$t('MEM_MEMBER_FIELD_AVATAR', '头像')" width="180" />
+      <el-table-column prop="mobile" :label="$t('G2_FIELD_MOBILE', '手机号')" width="180" />
+      <el-table-column prop="status" :label="$t('G2_FIELD_STATUS', '状态')" width="120">
+        <template #default="{ row }">
+          <DictText :value="row.status" usage-code="SUBJECT_STATUS" :api-method="DictItemApi.select" />
+        </template>
+      </el-table-column>
       <TableColumn prop="createTime" :label="$t('G2_FIELD_CREATE_TIME', '创建时间')" width="180" sortable="custom" />
       <TableColumn prop="updateTime" :label="$t('G2_FIELD_UPDATE_TIME', '更新时间')" width="180" sortable="custom" />
       <el-table-column :label="$t('G2_FIELD_ACTION', '操作')" fixed="right" width="280">
@@ -82,25 +87,25 @@
     </div>
 
     <!-- 新增 / 编辑弹窗 -->
-    <el-dialog v-model="editDialogVisible" :title="isEdit ? '编辑会员表' : '新增会员表'" width="520px">
-      <el-form ref="editFormRef" :model="editForm" :rules="editRules" label-width="100px">
-        <el-form-item label="机构标识，关联 g2rain_basis.organ.id，会员归属租户" prop="organId">
-          <el-input v-model="editForm.organId" placeholder="请输入机构标识，关联 g2rain_basis.organ.id，会员归属租户" />
+    <el-dialog v-model="editDialogVisible" :title="isEdit ? $t('MEM_MEMBER_DLG_EDIT', '编辑会员') : $t('MEM_MEMBER_DLG_ADD', '新增会员')" width="520px">
+      <el-form ref="editFormRef" :model="editForm" :rules="editRules" label-width="140px">
+        <el-form-item :label="$t('G2_FIELD_ORGAN', '所属机构')" prop="organId">
+          <OrganSelect v-model="editForm.organId" :api-method="OrganApi.searchOrgans" :placeholder="$t('G2_PH_ORGAN', '请选择所属机构')" width="100%" />
         </el-form-item>
-        <el-form-item label="会员编号，机构内唯一，由系统生成" prop="memberNo">
-          <el-input v-model="editForm.memberNo" placeholder="请输入会员编号，机构内唯一，由系统生成" />
+        <el-form-item :label="$t('MEM_MEMBER_FIELD_MEMBER_NO', '会员编号')" prop="memberNo">
+          <el-input v-model="editForm.memberNo" :placeholder="$t('MEM_MEMBER_PH_MEMBER_NO', '请输入会员编号')" />
         </el-form-item>
-        <el-form-item label="会员名称" prop="name">
-          <el-input v-model="editForm.name" placeholder="请输入会员名称" />
+        <el-form-item :label="$t('MEM_MEMBER_FIELD_NAME', '会员名称')" prop="name">
+          <el-input v-model="editForm.name" :placeholder="$t('MEM_MEMBER_PH_NAME', '请输入会员名称')" />
         </el-form-item>
-        <el-form-item label="会员头像地址" prop="avatar">
-          <el-input v-model="editForm.avatar" placeholder="请输入会员头像地址" />
+        <el-form-item :label="$t('MEM_MEMBER_FIELD_AVATAR', '头像')" prop="avatar">
+          <el-input v-model="editForm.avatar" :placeholder="$t('MEM_MEMBER_PH_AVATAR', '请输入头像地址')" />
         </el-form-item>
-        <el-form-item label="会员手机号，仅作为资料字段，登录身份以 member_identity 为准" prop="mobile">
-          <el-input v-model="editForm.mobile" placeholder="请输入会员手机号，仅作为资料字段，登录身份以 member_identity 为准" />
+        <el-form-item :label="$t('G2_FIELD_MOBILE', '手机号')" prop="mobile">
+          <el-input v-model="editForm.mobile" :placeholder="$t('G2_PH_MOBILE', '请输入手机号')" />
         </el-form-item>
-        <el-form-item label="会员状态" prop="status">
-          <el-input v-model="editForm.status" placeholder="请输入会员状态" />
+        <el-form-item :label="$t('G2_FIELD_STATUS', '状态')" prop="status">
+          <DictSelect v-model="editForm.status" usage-code="SUBJECT_STATUS" :api-method="DictItemApi.select" :placeholder="$t('G2_PH_STATUS', '请选择状态')" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -112,15 +117,17 @@
     </el-dialog>
 
     <!-- 明细弹窗 -->
-    <el-dialog v-model="detailDialogVisible" title="会员表明细" width="520px">
+    <el-dialog v-model="detailDialogVisible" :title="$t('MEM_MEMBER_DLG_DETAIL', '会员明细')" width="520px">
       <el-descriptions :column="1" border>
         <el-descriptions-item :label="$t('G2_FIELD_ID', 'ID')">{{ currentRow?.id }}</el-descriptions-item>
-        <el-descriptions-item label="机构标识，关联 g2rain_basis.organ.id，会员归属租户">{{ currentRow?.organId }}</el-descriptions-item>
-        <el-descriptions-item label="会员编号，机构内唯一，由系统生成">{{ currentRow?.memberNo }}</el-descriptions-item>
-        <el-descriptions-item label="会员名称">{{ currentRow?.name }}</el-descriptions-item>
-        <el-descriptions-item label="会员头像地址">{{ currentRow?.avatar }}</el-descriptions-item>
-        <el-descriptions-item label="会员手机号，仅作为资料字段，登录身份以 member_identity 为准">{{ currentRow?.mobile }}</el-descriptions-item>
-        <el-descriptions-item label="会员状态">{{ currentRow?.status }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('G2_FIELD_ORGAN', '所属机构')">{{ currentRow?.organName || currentRow?.organId }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('MEM_MEMBER_FIELD_MEMBER_NO', '会员编号')">{{ currentRow?.memberNo }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('MEM_MEMBER_FIELD_NAME', '会员名称')">{{ currentRow?.name }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('MEM_MEMBER_FIELD_AVATAR', '头像')">{{ currentRow?.avatar }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('G2_FIELD_MOBILE', '手机号')">{{ currentRow?.mobile }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('G2_FIELD_STATUS', '状态')">
+          <DictText :value="currentRow?.status" usage-code="SUBJECT_STATUS" :api-method="DictItemApi.select" />
+        </el-descriptions-item>
         <el-descriptions-item :label="$t('G2_FIELD_CREATE_TIME', '创建时间')">{{ currentRow?.createTime }}</el-descriptions-item>
         <el-descriptions-item :label="$t('G2_FIELD_UPDATE_TIME', '更新时间')">{{ currentRow?.updateTime }}</el-descriptions-item>
       </el-descriptions>
@@ -134,16 +141,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, computed, onMounted } from 'vue';
 import type { FormInstance, FormRules } from 'element-plus';
 import { ElMessageBox, ElMessage } from 'element-plus';
 import { t } from '@platform/i18n';
 import { MemberApi } from './api';
+import { OrganApi } from '../organ/api';
+import { DictItemApi } from '../dict/api';
 import type { Member, MemberPayload, MemberQuery } from './type';
 import type { BaseSelectListDto, PageSelectListDto } from '@platform/types/api.type';
 
 import { SortableTable, TableColumn, SortManagerButton, QueryForm } from '@g2rain/ui';
-import { showErrorMessage } from '@/components';
+import { OrganSelect, DictSelect, DictText } from '@g2rain/ui/platform';
 
 
 // 组件引用
@@ -159,12 +168,11 @@ const baseQueryForm = ref<BaseSelectListDto>({
 
 // 业务查询状态
 const queryForm = reactive({
-  organId: undefined,
+  organId: undefined as number | undefined,
   memberNo: '',
   name: '',
-  avatar: '',
   mobile: '',
-  status: '',
+  status: undefined as string | undefined,
 });
 
 // 分页相关状态
@@ -196,9 +204,8 @@ const loadData = async () => {
     // 设置响应结果
     tableData.value = pageData.records;
     pagination.total = pageData.total;
-  } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : t('G2_MSG_LOAD_FAIL', '加载列表失败');
-    showErrorMessage(msg);
+  } catch {
+    // 请求失败已由 http 层统一提示
   }
 };
 
@@ -220,14 +227,12 @@ const handleReset = () => {
   baseQueryForm.value.id = undefined;
   baseQueryForm.value.createTime = undefined;
   baseQueryForm.value.updateTime = undefined;
-  baseQueryForm.value.sorts = undefined;
   // 重置业务特定查询表单
   queryForm.organId = undefined;
   queryForm.memberNo = '';
   queryForm.name = '';
-  queryForm.avatar = '';
   queryForm.mobile = '';
-  queryForm.status = '';
+  queryForm.status = undefined;
 
   pagination.pageNum = 1; // 重置到第一页
   loadData();
@@ -259,22 +264,20 @@ const handleView = (row: Member) => {
 
 // 删除数据记录
 const handleDelete = (row: Member) => {
-  ElMessageBox.confirm(`确认删除会员表「${row.id}」吗？`, t('G2_LBL_TIP', '提示'), {
+  ElMessageBox.confirm(
+    t('MEM_MEMBER_DEL_CONFIRM', { id: row.id }, '确认删除会员「{id}」吗？'),
+    t('G2_LBL_TIP', '提示'),
+    {
     type: 'warning',
   })
     .then(async () => {
-      try {
-        await MemberApi.remove(row.id);
-        // 如果当前页只有一条数据，删除后应该跳转到上一页
-        if (tableData.value.length === 1 && pagination.pageNum > 1) {
-          pagination.pageNum--;
-        }
-        await loadData();
-        ElMessage.success(t('G2_MSG_DELETE_OK', '删除成功'));
-      } catch (error: unknown) {
-        const msg = error instanceof Error ? error.message : t('G2_MSG_DELETE_FAIL', '删除失败');
-        showErrorMessage(msg);
+      await MemberApi.remove(row.id);
+      // 如果当前页只有一条数据，删除后应该跳转到上一页
+      if (tableData.value.length === 1 && pagination.pageNum > 1) {
+        pagination.pageNum--;
       }
+      await loadData();
+      ElMessage.success(t('G2_MSG_DELETE_OK', '删除成功'));
     })
     .catch(() => {});
 };
@@ -296,15 +299,15 @@ const editForm = reactive({
   name: '',
   avatar: '',
   mobile: '',
-  status: '',
+  status: undefined as string | undefined,
 });
 
 // 表单校验规则
-const editRules: FormRules = {
-  organId: [{ required: true, message: '请输入机构标识，关联 g2rain_basis.organ.id，会员归属租户', trigger: 'blur' }],
-  memberNo: [{ required: true, message: '请输入会员编号，机构内唯一，由系统生成', trigger: 'blur' }],
-  status: [{ required: true, message: '请输入会员状态[NORMAL:正常, FROZEN:冻结]', trigger: 'blur' }],
-};
+const editRules = computed<FormRules>(() => ({
+  organId: [{ required: true, message: t('G2_PH_ORGAN', '请选择所属机构'), trigger: 'change' }],
+  memberNo: [{ required: true, message: t('MEM_MEMBER_PH_MEMBER_NO', '请输入会员编号'), trigger: 'blur' }],
+  status: [{ required: true, message: t('G2_PH_STATUS', '请选择状态'), trigger: 'change' }],
+}));
 
 // 打开创建弹窗
 const handleCreate = () => {
@@ -316,7 +319,7 @@ const handleCreate = () => {
   editForm.name = '';
   editForm.avatar = '';
   editForm.mobile = '';
-  editForm.status = '';
+  editForm.status = undefined;
   editDialogVisible.value = true;
 };
 
@@ -350,19 +353,14 @@ const submitEdit = async () => {
     status: editForm.status,
   };
 
-  try {
-    // 编辑模式下，将 id 添加到 payload 中
-    if (isEdit.value) {
-      payload.id = editForm.id;
-    }
-    await MemberApi.save(payload);
-    ElMessage.success(isEdit.value ? t('G2_MSG_UPDATE_OK', '更新成功') : t('G2_MSG_ADD_OK', '新增成功'));
-    await loadData();
-    editDialogVisible.value = false;
-  } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : t('G2_MSG_SAVE_FAIL', '保存失败');
-    showErrorMessage(msg);
+  // 编辑模式下，将 id 添加到 payload 中
+  if (isEdit.value) {
+    payload.id = editForm.id;
   }
+  await MemberApi.save(payload);
+  ElMessage.success(isEdit.value ? t('G2_MSG_UPDATE_OK', '更新成功') : t('G2_MSG_ADD_OK', '新增成功'));
+  await loadData();
+  editDialogVisible.value = false;
 };
 
 // 挂载回调

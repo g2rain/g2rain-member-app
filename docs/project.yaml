@@ -83,7 +83,7 @@ commands:
   resourceConfig: npm run build:config
   appCodegen: g2rain-app generate --tables=<table>
   appResourceConfig: g2rain-app build-config
-  image: docker build --build-arg VITE_BUILD_MODE=production -t g2rain/<app>:<tag> .
+  image: ./build.sh --image ghcr.io/g2rain/g2rain-member-app --tag <tag> --build-mode production
 
 generators:
   engine: create-g2rain-app
